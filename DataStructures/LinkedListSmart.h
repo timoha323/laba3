@@ -143,6 +143,37 @@ public:
         }
         return newList;
     }
+
+    class Iterator {
+    private:
+        std::shared_ptr<Node> current;
+
+    public:
+        explicit Iterator(std::shared_ptr<Node> node) : current(node) {}
+
+        T& operator*() {
+            return current->data;
+        }
+
+        Iterator& operator++() {
+            if (current) {
+                current = current->next;
+            }
+            return *this;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return current != other.current;
+        }
+    };
+
+    Iterator begin() const {
+        return Iterator(head);
+    }
+
+    Iterator end() const {
+        return Iterator(nullptr);
+    }
 };
 
 #endif // LINKEDLISTSMART_H

@@ -109,10 +109,10 @@ void HashTable<TKey, TElement>::Add(const TKey &key, const TElement &element) {
     size_t index = HashFunction(key) % capacity;
     LinkedListSmart<KeyValuePair> &chain = table->Get(static_cast<int>(index));
 
-    //пройтись итераторами
-    for (int i = 0; i < chain.GetLength(); ++i) {
-        if (chain.Get(i).key == key) {
-            chain.Get(i).value = element;
+    auto iterator = chain.begin();
+    for (; iterator != chain.end(); ++iterator) {
+        if ((*iterator).key == key) {
+            (*iterator).value = element;
             return;
         }
     }
@@ -130,10 +130,11 @@ void HashTable<TKey, TElement>::Remove(const TKey &key) {
     size_t index = HashFunction(key) % capacity;
     LinkedListSmart<KeyValuePair> &chain = table->Get(static_cast<int>(index));
 
-    //итераторы
-    //сжатие - если много пустых бакетов
-    for (int i = 0; i < chain.GetLength(); ++i) {
-        if (chain.Get(i).key == key) {
+    auto iterator = chain.begin();
+    int i = 0;
+    for (; iterator != chain.end(); ++iterator) {
+        ++i;
+        if ((*iterator).key == key) {
             chain.RemoveAt(i);
             --count;
             return;

@@ -236,4 +236,8 @@ CMakeFiles\laba3.dir\main.cpp.obj.ddi: \
  C:/Users/makar/CLionProjects/laba3/test_sparse_matrix.h \
  C:/Users/makar/CLionProjects/laba3/DataStructures/SparseMatrix.h \
  C:/Users/makar/CLionProjects/laba3/interface.h \
- C:/Users/makar/CLionProjects/laba3/DataStructures/UnqPtr.h
+ C:/Users/makar/CLionProjects/laba3/DataStructures/UnqPtr.h \
+ C:/mingw64/include/c++/14.2.0/fstream \
+ C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+ C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+ C:/mingw64/include/c++/14.2.0/bits/fstream.tcc

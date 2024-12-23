@@ -82912,6 +82912,37 @@ public:
         }
         return newList;
     }
+
+    class Iterator {
+    private:
+        std::shared_ptr<Node> current;
+
+    public:
+        explicit Iterator(std::shared_ptr<Node> node) : current(node) {}
+
+        T& operator*() {
+            return current->data;
+        }
+
+        Iterator& operator++() {
+            if (current) {
+                current = current->next;
+            }
+            return *this;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return current != other.current;
+        }
+    };
+
+    Iterator begin() const {
+        return Iterator(head);
+    }
+
+    Iterator end() const {
+        return Iterator(nullptr);
+    }
 };
 # 7 "C:/Users/makar/CLionProjects/laba3/DataStructures/HashTable.h" 2
 
@@ -92446,10 +92477,10 @@ void HashTable<TKey, TElement>::Add(const TKey &key, const TElement &element) {
     size_t index = HashFunction(key) % capacity;
     LinkedListSmart<KeyValuePair> &chain = table->Get(static_cast<int>(index));
 
-
-    for (int i = 0; i < chain.GetLength(); ++i) {
-        if (chain.Get(i).key == key) {
-            chain.Get(i).value = element;
+    auto iterator = chain.begin();
+    for (; iterator != chain.end(); ++iterator) {
+        if ((*iterator).key == key) {
+            (*iterator).value = element;
             return;
         }
     }
@@ -92467,10 +92498,11 @@ void HashTable<TKey, TElement>::Remove(const TKey &key) {
     size_t index = HashFunction(key) % capacity;
     LinkedListSmart<KeyValuePair> &chain = table->Get(static_cast<int>(index));
 
-
-
-    for (int i = 0; i < chain.GetLength(); ++i) {
-        if (chain.Get(i).key == key) {
+    auto iterator = chain.begin();
+    int i = 0;
+    for (; iterator != chain.end(); ++iterator) {
+        ++i;
+        if ((*iterator).key == key) {
             chain.RemoveAt(i);
             --count;
             return;
