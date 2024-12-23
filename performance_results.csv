@@ -1,0 +1,9 @@
+Dictionary,Structure,Size,NumElements,InsertionTime(ms),SearchTime(ms),MapTime(ms),ReduceTime(ms),UpdateTime(ms),IterationTime(ms)
+HashTable,Vector,50000,5000,15,2,3,1,2,1
+BTree,Vector,50000,5000,199,6,3,0,6,0
+HashTable,Matrix,50000,250,1,0,0,0,0,0
+BTree,Matrix,50000,250,5,0,0,0,0,0
+HashTable,Vector,100000,10000,23,3,4,1,3,1
+BTree,Vector,100000,10000,357,15,7,1,15,1
+HashTable,Matrix,100000,1000,2,0,0,0,0,0
+BTree,Matrix,100000,1000,28,1,0,0,1,0
