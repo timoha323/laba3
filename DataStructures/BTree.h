@@ -8,8 +8,6 @@
 #include <iostream>
 #include <stdexcept>
 
-//проверить структуру дерева
-
 template<typename TKey, typename TElement>
 class BTree : public IDictionary<TKey, TElement> {
 public:
@@ -37,7 +35,6 @@ private:
     struct Node {
         bool isLeaf;
         int numKeys;
-        //на списках
         UnqPtr<TKey[]> keys;
         UnqPtr<TElement[]> values;
         UnqPtr<ShrdPtr<Node>[]> children;

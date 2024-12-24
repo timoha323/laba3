@@ -91923,7 +91923,7 @@ UnqPtr<IDictionaryIterator<TKey, TElement>> HashTable<TKey, TElement>::GetIterat
 }
 # 6 "C:/Users/makar/CLionProjects/laba3/test_sparse_vector.h" 2
 # 1 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h" 1
-# 13 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h"
+# 15 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h"
 template<typename TKey, typename TElement>
 class BTree : public IDictionary<TKey, TElement> {
 public:
@@ -91951,13 +91951,13 @@ private:
     struct Node {
         bool isLeaf;
         int numKeys;
-
-        UnqPtr<TKey[]> keys;
-        UnqPtr<TElement[]> values;
-        UnqPtr<ShrdPtr<Node>[]> children;
+        LinkedListSmart<TKey> keys;
+        LinkedListSmart<TElement> values;
+        UnqPtr<LinkedListSmart<Node>> children;
 
         Node(bool leaf, int order);
     };
+
 
     ShrdPtr<Node> root;
     int order;
@@ -92020,21 +92020,22 @@ private:
     friend class BTreeTest;
 
 public:
-    void PrintStructure(ShrdPtr<Node> node = ShrdPtr<Node>(), int depth = 0) const {
+    void PrintStructure(ShrdPtr<Node> node = nullptr, int depth = 0) const {
         auto currentNode = node ? node : root;
         if (!currentNode) return;
 
         for (int i = 0; i < depth; ++i) std::cout << "  ";
         std::cout << "[";
-        for (int i = 0; i < currentNode->numKeys; ++i) {
-            if (i > 0) std::cout << ", ";
-            std::cout << currentNode->keys[i];
+        for (auto it = currentNode->keys.begin(); it != currentNode->keys.end(); ++it) {
+            if (it != currentNode->keys.begin()) std::cout << ", ";
+            std::cout << *it;
         }
         std::cout << "]\n";
 
         if (!currentNode->isLeaf) {
-            for (int i = 0; i <= currentNode->numKeys; ++i) {
-                PrintStructure(currentNode->children[i], depth + 1);
+            int i = 0;
+            for (auto it = currentNode->children->begin(); it != currentNode->children->end(); ++it, ++i) {
+                PrintStructure(*it, depth + 1);
             }
         }
     }
