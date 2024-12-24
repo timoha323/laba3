@@ -105766,7 +105766,7 @@ void generate_python_script() {
     pyfile << "            elements.append(num_elements)\n";
     pyfile << "    plt.plot(elements, times, label=filename)\n\n";
     pyfile << "def main():\n";
-    pyfile << "    files = [\"result_time_matrix_hash.txt\", \"result_time_matrix_b.txt\", \"result_time_matrix_compare.txt\", \"result_time_vector_hash.txt\", \"result_time_vector_b.txt\", \"result_time_vector_compare.txt\"]\n";
+    pyfile << "    files = [\"result_time_matrix_hash.txt\", \"result_time_matrix_b.txt\", \"result_time_vector_hash.txt\", \"result_time_vector_b.txt\"]\n";
     pyfile << "    for file in files:\n";
     pyfile << "        if os.path.exists(file):\n";
     pyfile << "            plot_file(file)\n";
@@ -105829,16 +105829,6 @@ int main() {
         {load_test_sparse_matrix(100000, 1000).second, 1000}
     };
 
-    const std::vector<Point> result_time_matrix_compare =
-    {
-        {load_test_sparse_matrix(100000000, 10000).first, 10000},
-        {load_test_sparse_matrix(1000000, 10000).first, 10000},
-        {load_test_sparse_matrix(1000000, 1000).first, 1000},
-        {load_test_sparse_matrix(100000000, 10000).second, 10000},
-        {load_test_sparse_matrix(1000000, 10000).second, 10000},
-        {load_test_sparse_matrix(1000000, 1000).second, 1000}
-    };
-
     std::cout << "\n------------------------\n";
     const std::vector<Point> result_time_vector_hash =
     {
@@ -105852,22 +105842,11 @@ int main() {
         {load_test_sparse_vector(100000000, 100000).second, 100000},
         {load_test_sparse_vector(10000000, 10000).second, 10000}
     };
-    const std::vector<Point> result_time_vector_compare =
-    {
-        {load_test_sparse_vector(100000000, 10000).first, 10000},
-        {load_test_sparse_vector(1000000, 10000).first, 10000},
-        {load_test_sparse_vector(1000000, 1000).first, 1000},
-        {load_test_sparse_vector(100000000, 10000).second, 10000},
-        {load_test_sparse_vector(1000000, 10000).second, 10000},
-        {load_test_sparse_vector(1000000, 1000).second, 1000}
-    };
     try {
         save_data_to_file("result_time_matrix_hash.txt", result_time_matrix_hash);
         save_data_to_file("result_time_matrix_b.txt", result_time_matrix_b);
-        save_data_to_file("result_time_matrix_compare.txt", result_time_matrix_compare);
         save_data_to_file("result_time_vector_hash.txt", result_time_vector_hash);
         save_data_to_file("result_time_vector_b.txt", result_time_vector_b);
-        save_data_to_file("result_time_vector_compare.txt", result_time_vector_compare);
 
         generate_python_script();
 
@@ -105882,16 +105861,12 @@ int main() {
     plotGraph(result_time_vector_hash);
     std::cout << "\nResult time B_TREE\n\n\n";
     plotGraph(result_time_vector_b);
-    std::cout << "\nResult time COMPARE\n\n\n";
-    plotGraph(result_time_vector_compare);
     std::cout << "\n------------------------\n";
     std::cout << "Result time matrix\n\n\n";
     std::cout << "\nResult time HASH TABLE\n\n\n";
     plotGraph(result_time_matrix_hash);
     std::cout << "\nResult time B_TREE\n\n\n";
     plotGraph(result_time_matrix_b);
-    std::cout << "\nResult time COMPARE\n\n\n";
-    plotGraph(result_time_matrix_compare);
     std::cout << "\n------------------------\n";
     test_sparse_vector();
     test_sparse_matrix();

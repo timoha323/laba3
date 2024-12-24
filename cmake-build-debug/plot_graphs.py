@@ -12,7 +12,7 @@ def plot_file(filename):
     plt.plot(elements, times, label=filename)
 
 def main():
-    files = ["result_time_matrix_hash.txt", "result_time_matrix_b.txt", "result_time_matrix_compare.txt", "result_time_vector_hash.txt", "result_time_vector_b.txt", "result_time_vector_compare.txt"]
+    files = ["result_time_matrix_hash.txt", "result_time_matrix_b.txt", "result_time_vector_hash.txt", "result_time_vector_b.txt"]
     for file in files:
         if os.path.exists(file):
             plot_file(file)
