@@ -82224,178 +82224,6 @@ private:
 # 4 "C:/Users/makar/CLionProjects/laba3/test.cpp" 2
 # 1 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h" 1
 # 11 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h"
-# 1 "C:/Users/makar/CLionProjects/laba3/DataStructures/LinkedListSmart.h" 1
-# 12 "C:/Users/makar/CLionProjects/laba3/DataStructures/LinkedListSmart.h"
-template <typename T>
-class LinkedListSmart : public Sequence<T> {
-private:
-    struct Node {
-        T data;
-        std::shared_ptr<Node> next;
-
-        explicit Node(const T& item) : data(item), next(nullptr) {}
-    };
-
-    std::shared_ptr<Node> head;
-    size_t length;
-
-public:
-    LinkedListSmart() : head(nullptr), length(0) {}
-    ~LinkedListSmart() override = default;
-
-    T& GetFirst() const override {
-        if (!head)
-            throw std::out_of_range("LinkedListSmart is empty");
-        return head->data;
-    }
-
-    T& GetLast() const override {
-        if (!head)
-            throw std::out_of_range("LinkedListSmart is empty");
-        auto current = head;
-        while (current->next) {
-            current = current->next;
-        }
-        return current->data;
-    }
-
-    T& Get(int index) const override {
-        if (index < 0 || static_cast<size_t>(index) >= length)
-            throw std::out_of_range("Index out of range");
-        auto current = head;
-        for (int i = 0; i < index; ++i) {
-            current = current->next;
-        }
-        return current->data;
-    }
-
-    Sequence<T>* GetSubsequence(int startIndex, int endIndex) const override {
-        if (startIndex < 0 || endIndex >= static_cast<int>(length) || startIndex > endIndex)
-            throw std::out_of_range("Invalid subsequence indices");
-
-        auto subseq = new LinkedListSmart<T>();
-        auto current = head;
-        for (int i = 0; i <= endIndex; ++i) {
-            if (i >= startIndex) {
-                subseq->Append(current->data);
-            }
-            current = current->next;
-        }
-        return subseq;
-    }
-
-    int GetLength() const override {
-        return static_cast<int>(length);
-    }
-
-    void Append(const T& item) override {
-        auto newNode = std::make_shared<Node>(item);
-        if (!head) {
-            head = newNode;
-        } else {
-            auto current = head;
-            while (current->next) {
-                current = current->next;
-            }
-            current->next = newNode;
-        }
-        ++length;
-    }
-
-    void Prepend(const T& item) override {
-        auto newNode = std::make_shared<Node>(item);
-        newNode->next = head;
-        head = newNode;
-        ++length;
-    }
-
-    void InsertAt(const T& item, int index) override {
-        if (index < 0 || index > static_cast<int>(length))
-            throw std::out_of_range("Index out of range");
-        if (index == 0) {
-            Prepend(item);
-        } else {
-            auto current = head;
-            for (int i = 0; i < index - 1; ++i) {
-                current = current->next;
-            }
-            auto newNode = std::make_shared<Node>(item);
-            newNode->next = current->next;
-            current->next = newNode;
-            ++length;
-        }
-    }
-
-    void RemoveAt(int index) override {
-        if (index < 0 || index >= static_cast<int>(length))
-            throw std::out_of_range("Index out of range");
-
-        if (index == 0) {
-            if (head) {
-                head = head->next;
-                --length;
-            }
-        } else {
-            auto current = head;
-            for (int i = 0; i < index - 1; ++i) {
-                current = current->next;
-            }
-
-            if (current->next) {
-                current->next = current->next->next;
-                --length;
-            }
-        }
-    }
-
-    Sequence<T>* Concat(Sequence<T>* list) const override {
-        auto newList = new LinkedListSmart<T>();
-        auto current = head;
-        while (current) {
-            newList->Append(current->data);
-            current = current->next;
-        }
-        for (int i = 0; i < list->GetLength(); ++i) {
-            newList->Append(list->Get(i));
-        }
-        return newList;
-    }
-
-    class Iterator {
-    private:
-        std::shared_ptr<Node> current;
-
-    public:
-        explicit Iterator(std::shared_ptr<Node> node) : current(node) {}
-
-        T& operator*() {
-            return current->data;
-        }
-
-        Iterator& operator++() {
-            if (current) {
-                current = current->next;
-            }
-            return *this;
-        }
-
-        bool operator!=(const Iterator& other) const {
-            return current != other.current;
-        }
-    };
-
-    Iterator begin() const {
-        return Iterator(head);
-    }
-
-    Iterator end() const {
-        return Iterator(nullptr);
-    }
-};
-# 12 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h" 2
-
-
-
 template<typename TKey, typename TElement>
 class BTree : public IDictionary<TKey, TElement> {
 public:
@@ -82423,13 +82251,12 @@ private:
     struct Node {
         bool isLeaf;
         int numKeys;
-        LinkedListSmart<TKey> keys;
-        LinkedListSmart<TElement> values;
-        UnqPtr<LinkedListSmart<Node>> children;
+        UnqPtr<TKey[]> keys;
+        UnqPtr<TElement[]> values;
+        UnqPtr<ShrdPtr<Node>[]> children;
 
         Node(bool leaf, int order);
     };
-
 
     ShrdPtr<Node> root;
     int order;
@@ -82492,22 +82319,21 @@ private:
     friend class BTreeTest;
 
 public:
-    void PrintStructure(ShrdPtr<Node> node = nullptr, int depth = 0) const {
+    void PrintStructure(ShrdPtr<Node> node = ShrdPtr<Node>(), int depth = 0) const {
         auto currentNode = node ? node : root;
         if (!currentNode) return;
 
         for (int i = 0; i < depth; ++i) std::cout << "  ";
         std::cout << "[";
-        for (auto it = currentNode->keys.begin(); it != currentNode->keys.end(); ++it) {
-            if (it != currentNode->keys.begin()) std::cout << ", ";
-            std::cout << *it;
+        for (int i = 0; i < currentNode->numKeys; ++i) {
+            if (i > 0) std::cout << ", ";
+            std::cout << currentNode->keys[i];
         }
         std::cout << "]\n";
 
         if (!currentNode->isLeaf) {
-            int i = 0;
-            for (auto it = currentNode->children->begin(); it != currentNode->children->end(); ++it, ++i) {
-                PrintStructure(*it, depth + 1);
+            for (int i = 0; i <= currentNode->numKeys; ++i) {
+                PrintStructure(currentNode->children[i], depth + 1);
             }
         }
     }
@@ -82944,7 +82770,183 @@ UnqPtr<IDictionaryIterator<TKey, TElement>> BTree<TKey, TElement>::GetIterator()
 # 1 "C:/Users/makar/CLionProjects/laba3/DataStructures/UnqPtr.h" 1
 # 6 "C:/Users/makar/CLionProjects/laba3/test.cpp" 2
 # 1 "C:/Users/makar/CLionProjects/laba3/DataStructures/HashTable.h" 1
-# 10 "C:/Users/makar/CLionProjects/laba3/DataStructures/HashTable.h"
+
+
+
+
+
+# 1 "C:/Users/makar/CLionProjects/laba3/DataStructures/LinkedListSmart.h" 1
+# 12 "C:/Users/makar/CLionProjects/laba3/DataStructures/LinkedListSmart.h"
+template <typename T>
+class LinkedListSmart : public Sequence<T> {
+private:
+    struct Node {
+        T data;
+        std::shared_ptr<Node> next;
+
+        explicit Node(const T& item) : data(item), next(nullptr) {}
+    };
+
+    std::shared_ptr<Node> head;
+    size_t length;
+
+public:
+    LinkedListSmart() : head(nullptr), length(0) {}
+    ~LinkedListSmart() override = default;
+
+    T& GetFirst() const override {
+        if (!head)
+            throw std::out_of_range("LinkedListSmart is empty");
+        return head->data;
+    }
+
+    T& GetLast() const override {
+        if (!head)
+            throw std::out_of_range("LinkedListSmart is empty");
+        auto current = head;
+        while (current->next) {
+            current = current->next;
+        }
+        return current->data;
+    }
+
+    T& Get(int index) const override {
+        if (index < 0 || static_cast<size_t>(index) >= length)
+            throw std::out_of_range("Index out of range");
+        auto current = head;
+        for (int i = 0; i < index; ++i) {
+            current = current->next;
+        }
+        return current->data;
+    }
+
+    Sequence<T>* GetSubsequence(int startIndex, int endIndex) const override {
+        if (startIndex < 0 || endIndex >= static_cast<int>(length) || startIndex > endIndex)
+            throw std::out_of_range("Invalid subsequence indices");
+
+        auto subseq = new LinkedListSmart<T>();
+        auto current = head;
+        for (int i = 0; i <= endIndex; ++i) {
+            if (i >= startIndex) {
+                subseq->Append(current->data);
+            }
+            current = current->next;
+        }
+        return subseq;
+    }
+
+    int GetLength() const override {
+        return static_cast<int>(length);
+    }
+
+    void Append(const T& item) override {
+        auto newNode = std::make_shared<Node>(item);
+        if (!head) {
+            head = newNode;
+        } else {
+            auto current = head;
+            while (current->next) {
+                current = current->next;
+            }
+            current->next = newNode;
+        }
+        ++length;
+    }
+
+    void Prepend(const T& item) override {
+        auto newNode = std::make_shared<Node>(item);
+        newNode->next = head;
+        head = newNode;
+        ++length;
+    }
+
+    void InsertAt(const T& item, int index) override {
+        if (index < 0 || index > static_cast<int>(length))
+            throw std::out_of_range("Index out of range");
+        if (index == 0) {
+            Prepend(item);
+        } else {
+            auto current = head;
+            for (int i = 0; i < index - 1; ++i) {
+                current = current->next;
+            }
+            auto newNode = std::make_shared<Node>(item);
+            newNode->next = current->next;
+            current->next = newNode;
+            ++length;
+        }
+    }
+
+    void RemoveAt(int index) override {
+        if (index < 0 || index >= static_cast<int>(length))
+            throw std::out_of_range("Index out of range");
+
+        if (index == 0) {
+            if (head) {
+                head = head->next;
+                --length;
+            }
+        } else {
+            auto current = head;
+            for (int i = 0; i < index - 1; ++i) {
+                current = current->next;
+            }
+
+            if (current->next) {
+                current->next = current->next->next;
+                --length;
+            }
+        }
+    }
+
+    Sequence<T>* Concat(Sequence<T>* list) const override {
+        auto newList = new LinkedListSmart<T>();
+        auto current = head;
+        while (current) {
+            newList->Append(current->data);
+            current = current->next;
+        }
+        for (int i = 0; i < list->GetLength(); ++i) {
+            newList->Append(list->Get(i));
+        }
+        return newList;
+    }
+
+    class Iterator {
+    private:
+        std::shared_ptr<Node> current;
+
+    public:
+        explicit Iterator(std::shared_ptr<Node> node) : current(node) {}
+
+        T& operator*() {
+            return current->data;
+        }
+
+        Iterator& operator++() {
+            if (current) {
+                current = current->next;
+            }
+            return *this;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return current != other.current;
+        }
+    };
+
+    Iterator begin() const {
+        return Iterator(head);
+    }
+
+    Iterator end() const {
+        return Iterator(nullptr);
+    }
+};
+# 7 "C:/Users/makar/CLionProjects/laba3/DataStructures/HashTable.h" 2
+
+
+
 # 1 "C:/mingw64/include/c++/14.2.0/functional" 1 3
 # 46 "C:/mingw64/include/c++/14.2.0/functional" 3
        

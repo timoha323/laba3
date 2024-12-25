@@ -51,6 +51,15 @@ void generate_python_script() {
 }
 
 void TestBTree() {
+    BTree<int, std::string> tree1;
+    tree1.Add(10, "Ten");
+    tree1.PrintStructure();
+    tree1.Add(20, "Twenty");
+    tree1.PrintStructure();
+    tree1.Add(5, "Five");
+    tree1.PrintStructure();
+    tree1.Add(15, "Fifteen");
+    tree1.PrintStructure();
     BTree<int, std::string> tree;
 
     tree.Add(10, "Ten");
@@ -93,7 +102,6 @@ int main() {
     };
     const std::vector<Point> result_time_matrix_b =
     {
-
         {load_test_sparse_matrix(10000000, 100000).second, 100000},
         {load_test_sparse_matrix(1000000, 10000).second, 10000},
         {load_test_sparse_matrix(100000, 1000).second, 1000}

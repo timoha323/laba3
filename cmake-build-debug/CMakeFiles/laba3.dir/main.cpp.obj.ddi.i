@@ -91923,7 +91923,7 @@ UnqPtr<IDictionaryIterator<TKey, TElement>> HashTable<TKey, TElement>::GetIterat
 }
 # 6 "C:/Users/makar/CLionProjects/laba3/test_sparse_vector.h" 2
 # 1 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h" 1
-# 15 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h"
+# 11 "C:/Users/makar/CLionProjects/laba3/DataStructures/BTree.h"
 template<typename TKey, typename TElement>
 class BTree : public IDictionary<TKey, TElement> {
 public:
@@ -91951,13 +91951,12 @@ private:
     struct Node {
         bool isLeaf;
         int numKeys;
-        LinkedListSmart<TKey> keys;
-        LinkedListSmart<TElement> values;
-        UnqPtr<LinkedListSmart<Node>> children;
+        UnqPtr<TKey[]> keys;
+        UnqPtr<TElement[]> values;
+        UnqPtr<ShrdPtr<Node>[]> children;
 
         Node(bool leaf, int order);
     };
-
 
     ShrdPtr<Node> root;
     int order;
@@ -92020,22 +92019,21 @@ private:
     friend class BTreeTest;
 
 public:
-    void PrintStructure(ShrdPtr<Node> node = nullptr, int depth = 0) const {
+    void PrintStructure(ShrdPtr<Node> node = ShrdPtr<Node>(), int depth = 0) const {
         auto currentNode = node ? node : root;
         if (!currentNode) return;
 
         for (int i = 0; i < depth; ++i) std::cout << "  ";
         std::cout << "[";
-        for (auto it = currentNode->keys.begin(); it != currentNode->keys.end(); ++it) {
-            if (it != currentNode->keys.begin()) std::cout << ", ";
-            std::cout << *it;
+        for (int i = 0; i < currentNode->numKeys; ++i) {
+            if (i > 0) std::cout << ", ";
+            std::cout << currentNode->keys[i];
         }
         std::cout << "]\n";
 
         if (!currentNode->isLeaf) {
-            int i = 0;
-            for (auto it = currentNode->children->begin(); it != currentNode->children->end(); ++it, ++i) {
-                PrintStructure(*it, depth + 1);
+            for (int i = 0; i <= currentNode->numKeys; ++i) {
+                PrintStructure(currentNode->children[i], depth + 1);
             }
         }
     }
@@ -105782,6 +105780,15 @@ void generate_python_script() {
 }
 
 void TestBTree() {
+    BTree<int, std::string> tree1;
+    tree1.Add(10, "Ten");
+    tree1.PrintStructure();
+    tree1.Add(20, "Twenty");
+    tree1.PrintStructure();
+    tree1.Add(5, "Five");
+    tree1.PrintStructure();
+    tree1.Add(15, "Fifteen");
+    tree1.PrintStructure();
     BTree<int, std::string> tree;
 
     tree.Add(10, "Ten");
